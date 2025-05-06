@@ -1,6 +1,14 @@
 name: CI/CD Pipeline
 
-on: [push, pull_request]
+on:
+  push:
+    branches:
+      - main
+    tags:
+      - '*'
+  pull_request:
+    branches:
+      - main
 
 jobs:
   build:
@@ -8,12 +16,27 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       
+      - name: Set up environment variables
+        run: |
+          echo "DATABASE_URL=${{ secrets.DATABASE_URL }}" >> $GITHUB_ENV
+          echo "SECRET_KEY=${{ secrets.SECRET_KEY }}" >> $GITHUB_ENV
+          echo "API_KEY=${{ secrets.API_KEY }}" >> $GITHUB_ENV
+
+      - name: Log in to GitHub Container Registry
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.MY_PERSONAL_TOKEN }} 
+
       - name: Build and push Docker image
         uses: docker/build-push-action@v4
         with:
-          context: ./app
+          context: .
           push: true
-          tags: ghcr.io/15kamani/image:latest
-          secrets: |
+          tags: ghcr.io/15kamani/my-fastapi-app:latest
+          build-args: |
             DATABASE_URL=${{ secrets.DATABASE_URL }}
             SECRET_KEY=${{ secrets.SECRET_KEY }}
+            API_KEY=${{ secrets.API_KEY }}
+            
