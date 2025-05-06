@@ -57,7 +57,7 @@ networks:
 # залдание 6
 # services:
 #   fastapi:
-#     image: ghcr.io/your-username/your-image:latest
+#     image: ghcr.io/15kamani/image:latest
 #     env_file: .env
 #     deploy:
 #       replicas: 3  # Запуск 3 экземпляров
